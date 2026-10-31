@@ -31,6 +31,8 @@ Os testes unitarios usam o test runner nativo do Node.js e nao precisam de banco
 npm test
 ```
 
+O GitHub Actions executa primeiro os testes unitarios e depois a suite do repositorio `davisonalves/todo-integration-tests` usando Docker Compose. Se esse repositorio for privado, configure o secret `INTEGRATION_TESTS_REPO_TOKEN` no repositorio do app com um token que tenha acesso de leitura ao conteudo da suite.
+
 ## API
 
 Documentacao completa, com formatos de requisicao/resposta e exemplos `curl`, em [API.md](./API.md).

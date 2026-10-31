@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout aplicacao
+        uses: actions/checkout@v4
+        with:
+          path: todo-app
+          persist-credentials: false
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Executar testes unitarios
+        working-directory: todo-app
+        run: npm test
+
+      - name: Checkout repositorio de testes de integracao
+        id: checkout_integration
+        uses: actions/checkout@v4
+        with:
+          repository: davisonalves/todo-integration-tests
+          ref: main
+          token: ${{ secrets.INTEGRATION_TESTS_REPO_TOKEN || github.token }}
+          path: todo-integration-tests
+          persist-credentials: false
+
+      - name: Executar testes de integracao
+        working-directory: todo-integration-tests
+        run: docker compose -f compose.yaml up --build --exit-code-from integration-tests
+
+      - name: Encerrar containers de integracao
+        if: always() && steps.checkout_integration.outcome == 'success'
+        working-directory: todo-integration-tests
+        run: docker compose -f compose.yaml down --volumes --remove-orphans
