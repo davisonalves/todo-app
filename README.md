@@ -33,6 +33,8 @@ npm test
 
 ## API
 
+Documentacao completa, com formatos de requisicao/resposta e exemplos `curl`, em [API.md](./API.md).
+
 - `GET /api/tasks` lista tarefas.
 - `POST /api/tasks` cria uma tarefa com `{ "title": "..." }`.
 - `PUT /api/tasks/:id` atualiza com `{ "title": "...", "completed": false }`.
