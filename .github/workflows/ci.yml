@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: davisonalves/todo-integration-tests
-          ref: main
+          ref: master
           token: ${{ secrets.INTEGRATION_TESTS_REPO_TOKEN }}
           path: todo-integration-tests
           persist-credentials: false
