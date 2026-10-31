@@ -29,13 +29,22 @@ jobs:
         working-directory: todo-app
         run: npm test
 
+      - name: Verificar token do repositorio de testes
+        env:
+          INTEGRATION_TESTS_REPO_TOKEN: ${{ secrets.INTEGRATION_TESTS_REPO_TOKEN }}
+        run: |
+          if [ -z "$INTEGRATION_TESTS_REPO_TOKEN" ]; then
+            echo "::error::Configure o secret INTEGRATION_TESTS_REPO_TOKEN com acesso de leitura a davisonalves/todo-integration-tests."
+            exit 1
+          fi
+
       - name: Checkout repositorio de testes de integracao
         id: checkout_integration
         uses: actions/checkout@v4
         with:
           repository: davisonalves/todo-integration-tests
           ref: main
-          token: ${{ secrets.INTEGRATION_TESTS_REPO_TOKEN || github.token }}
+          token: ${{ secrets.INTEGRATION_TESTS_REPO_TOKEN }}
           path: todo-integration-tests
           persist-credentials: false
 
