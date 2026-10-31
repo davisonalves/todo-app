@@ -22,7 +22,7 @@ class TaskController {
       return { status: 400, body: { error: 'O titulo deve ter no maximo 200 caracteres.' } };
     }
 
-    return { status: 200, body: await this.taskModel.create(title) };
+    return { status: 201, body: await this.taskModel.create(title) };
   }
 
   async update(id, body) {
