@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f6fa">
+    <title>Minhas tarefas</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="todo-app">
+      <header class="app-header">
+        <p class="eyebrow">ORGANIZE SEU DIA</p>
+        <h1>Minhas tarefas<span>.</span></h1>
+        <p class="subtitle">Um passo de cada vez.</p>
+      </header>
+
+      <form id="task-form" class="task-form">
+        <label class="sr-only" for="task-title">Nova tarefa</label>
+        <input id="task-title" name="title" type="text" maxlength="200"
+          placeholder="O que você precisa fazer?" autocomplete="off" required>
+        <button type="submit">Adicionar <span aria-hidden="true">+</span></button>
+      </form>
+
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+
+      <section class="task-section" aria-labelledby="task-heading">
+        <div class="section-heading">
+          <h2 id="task-heading">Sua lista</h2>
+          <span id="task-count" class="task-count">0 tarefas</span>
+        </div>
+        <ul id="task-list" class="task-list"></ul>
+        <p id="empty-state" class="empty-state">Tudo em dia por aqui. Adicione uma tarefa para começar!</p>
+      </section>
+      <footer>Suas tarefas, salvas e prontas para você.</footer>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
