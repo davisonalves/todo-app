@@ -1,46 +1,51 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const TaskController = require('../src/controllers/taskController');
+const GetTasksController = require('../src/controllers/getTasksController');
+const CreateTaskController = require('../src/controllers/createTaskController');
+const UpdateTaskController = require('../src/controllers/updateTaskController');
+const DeleteTaskController = require('../src/controllers/deleteTaskController');
 
-function createController(overrides = {}) {
-  const taskModel = {
-    findAll: async () => [],
-    create: async (title) => ({ id: '1', title, completed: false }),
-    update: async (id, task) => ({ id, ...task }),
-    delete: async () => true,
+function createService(overrides = {}) {
+  return {
+    execute: async () => [],
     ...overrides
   };
-  return new TaskController(taskModel);
 }
 
 test('lista tarefas', async () => {
   const tasks = [{ id: '1', title: 'Estudar', completed: false }];
-  const controller = createController({ findAll: async () => tasks });
+  const controller = new GetTasksController(createService({
+    execute: async () => tasks
+  }));
 
-  assert.deepEqual(await controller.list(), { status: 200, body: tasks });
+  assert.deepEqual(await controller.handle(), { status: 200, body: tasks });
 });
 
 test('cria tarefa com titulo normalizado', async () => {
-  const controller = createController();
+  const controller = new CreateTaskController(createService({
+    execute: async (title) => ({ id: '1', title, completed: false })
+  }));
 
-  assert.deepEqual(await controller.create({ title: '  Estudar  ' }), {
+  assert.deepEqual(await controller.handle({ title: '  Estudar  ' }), {
     status: 201,
     body: { id: '1', title: 'Estudar', completed: false }
   });
 });
 
 test('rejeita titulo vazio e titulo longo demais', async () => {
-  const controller = createController();
+  const controller = new CreateTaskController(createService());
 
-  assert.equal((await controller.create({ title: '   ' })).status, 400);
-  assert.equal((await controller.create({ title: 'a'.repeat(201) })).status, 400);
-  assert.equal((await controller.create(null)).status, 400);
+  assert.equal((await controller.handle({ title: '   ' })).status, 400);
+  assert.equal((await controller.handle({ title: 'a'.repeat(201) })).status, 400);
+  assert.equal((await controller.handle(null)).status, 400);
 });
 
 test('atualiza tarefa quando os dados sao validos', async () => {
-  const controller = createController();
+  const controller = new UpdateTaskController(createService({
+    execute: async (id, task) => ({ id, ...task })
+  }));
 
-  assert.deepEqual(await controller.update('4', {
+  assert.deepEqual(await controller.handle('4', {
     title: 'Revisar',
     completed: true
   }), {
@@ -50,34 +55,38 @@ test('atualiza tarefa quando os dados sao validos', async () => {
 });
 
 test('valida identificador e campos ao atualizar', async () => {
-  const controller = createController();
+  const controller = new UpdateTaskController(createService());
 
-  assert.equal((await controller.update('0', {
+  assert.equal((await controller.handle('0', {
     title: 'Tarefa',
     completed: false
   })).status, 400);
-  assert.equal((await controller.update('1', {
+  assert.equal((await controller.handle('1', {
     title: 'Tarefa',
     completed: 'false'
   })).status, 400);
-  assert.equal((await controller.update('1', null)).status, 400);
+  assert.equal((await controller.handle('1', null)).status, 400);
 });
 
 test('retorna 404 quando a tarefa nao existe', async () => {
-  const controller = createController({
-    update: async () => null,
-    delete: async () => false
-  });
+  const updateController = new UpdateTaskController(createService({
+    execute: async () => null
+  }));
+  const deleteController = new DeleteTaskController(createService({
+    execute: async () => false
+  }));
 
-  assert.equal((await controller.update('1', {
+  assert.equal((await updateController.handle('1', {
     title: 'Tarefa',
     completed: false
   })).status, 404);
-  assert.equal((await controller.remove('1')).status, 404);
+  assert.equal((await deleteController.handle('1')).status, 404);
 });
 
 test('remove tarefa existente', async () => {
-  const controller = createController();
+  const controller = new DeleteTaskController(createService({
+    execute: async () => true
+  }));
 
-  assert.deepEqual(await controller.remove('1'), { status: 204, body: null });
+  assert.deepEqual(await controller.handle('1'), { status: 204, body: null });
 });
