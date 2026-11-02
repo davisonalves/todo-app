@@ -50,7 +50,7 @@ jobs:
 
       - name: Executar testes de integracao
         working-directory: todo-integration-tests
-        run: docker compose -f compose.yaml up --build --exit-code-from integration-tests
+        run: npm run test
 
       - name: Encerrar containers de integracao
         if: always() && steps.checkout_integration.outcome == 'success'
