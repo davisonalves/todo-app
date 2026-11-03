@@ -48,11 +48,10 @@ jobs:
           path: todo-integration-tests
           persist-credentials: false
 
+      - name: Instalar dependencias dos testes de integracao
+        working-directory: todo-integration-tests
+        run: npm ci
+
       - name: Executar testes de integracao
         working-directory: todo-integration-tests
         run: npm run test
-
-      - name: Encerrar containers de integracao
-        if: always() && steps.checkout_integration.outcome == 'success'
-        working-directory: todo-integration-tests
-        run: docker compose -f compose.yaml down --volumes --remove-orphans
